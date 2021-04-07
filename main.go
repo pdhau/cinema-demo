@@ -30,7 +30,7 @@ func init() {
 
 	for col := 0; col < configs.Column; col++ {
 		for row := 0; row < configs.Column; row++ {
-			_, err := db.Exec("INSERT INTO seat VALUES (?,?,?)", row, col, "0")
+			_, err := db.Exec("INSERT INTO seat VALUES (?,?,?,?)", row, col, "0", "")
 			if err != nil {
 				panic(err)
 			}
