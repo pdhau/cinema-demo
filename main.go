@@ -1,8 +1,10 @@
 package main
 
 import (
-	"database/sql"
-	"net/http"
+	"fmt"
+	"phau/cinema-demo/configs"
+	"phau/cinema-demo/controllers"
+	"phau/cinema-demo/utils"
 
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
@@ -13,42 +15,27 @@ func main() {
 	e := echo.New()
 
 	// Routes
-	e.GET("/", hello)
-	e.GET("/v1/seat", getSeat)
+	e.GET("/v1/seat", controllers.GetSeat)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":80"))
 }
 
-// Handler
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
-}
-
-func getSeat(c echo.Context) error {
-	seats := []Seat{}
-	db, err := sql.Open("sqlite3", "./db/cinema-demo.db")
-	if err != nil {
-		panic(err)
-	}
-	rows, err := db.Query("SELECT * from seat")
+func init() {
+	db := utils.GetDBConnect()
+	_, err := db.Exec("DELETE FROM seat")
 	if err != nil {
 		panic(err)
 	}
 
-	for rows.Next(){
-		seat := Seat{}
-		err := rows.Scan(&seat.Row, &seat.Column, &seat.Status)
-		if err != nil {
-			panic(err)
+	for col := 0; col < configs.Column; col++ {
+		for row := 0; row < configs.Column; row++ {
+			_, err := db.Exec("INSERT INTO seat VALUES (?,?,?)", row, col, "0")
+			if err != nil {
+				panic(err)
+			}
 		}
-		seats = append(seats, seat)
 	}
-	return c.JSON(http.StatusOK, seats)
-}
 
-type Seat struct {
-	Row    int
-	Column int
-	Status string
+	fmt.Println("Init successfully")
 }
