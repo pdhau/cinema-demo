@@ -32,8 +32,10 @@ func GetSeats(condition map[string]string) []Seat {
 	for k, v := range condition {
 		switch k {
 		case "group":
-			whereClause = append(whereClause, fmt.Sprintf("%s = ? AND %s = \"\"", k, k))
-			valueForWhereClause = append(valueForWhereClause, v)
+			if v != "" {
+				whereClause = append(whereClause, fmt.Sprintf("%s = ? AND %s = \"\"", k, k))
+				valueForWhereClause = append(valueForWhereClause, v)
+			}
 		default:
 			whereClause = append(whereClause, fmt.Sprintf("%s = ?", k))
 			valueForWhereClause = append(valueForWhereClause, v)
